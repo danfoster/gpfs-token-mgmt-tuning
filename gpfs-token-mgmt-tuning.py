@@ -31,9 +31,11 @@ def check(left,right):
     ratio = round((left/right)*100,2)
     if ratio < 100:
         sys.stdout.write(bcolors.OKGREEN)
+        state = "OK"
     else:
         sys.stdout.write(bcolors.FAIL)
-    print "%s%%%s" % (ratio,bcolors.ENDC)
+        state = "FAIL"
+    print "%s%% (%s)%s" % (ratio,state,bcolors.ENDC)
     return left < right
 
 def usage():
