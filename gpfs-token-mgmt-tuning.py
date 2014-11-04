@@ -28,14 +28,14 @@ def check(left,right):
     Check is the contition that IBM recommend for token manager tuning coniditions:
     # nodes (local and remote) * (MFTC + MSC) < (#manager nodes -1) * 1.2M * (512M/TML)
     '''
-    ratio = round((left/right)*100,2)
-    if ratio < 100:
+    ratio = round((left/right),2)
+    if ratio < 1:
         sys.stdout.write(bcolors.OKGREEN)
         state = "OK"
     else:
         sys.stdout.write(bcolors.FAIL)
         state = "FAIL"
-    print "%s%% (%s)%s" % (ratio,state,bcolors.ENDC)
+    print "%s (%s)%s" % (ratio,state,bcolors.ENDC)
     return left < right
 
 def usage():
