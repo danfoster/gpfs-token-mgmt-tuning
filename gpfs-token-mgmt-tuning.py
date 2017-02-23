@@ -26,7 +26,7 @@ def run(c):
 def check(left,right):
     '''
     Check is the contition that IBM recommend for token manager tuning coniditions:
-    # nodes (local and remote) * (MFTC + MSC) < (#manager nodes -1) * 1.2M * (512M/TML)
+    # nodes (local and remote) * (MFTC + MSC) < (#manager nodes -1) * 1.2M * (TML/512M)
     '''
     ratio = round((left/right),2)
     if ratio < 1:
@@ -60,7 +60,7 @@ num_nodes=int(run("%s --network | grep '<c0' | wc -l" % (mmdiag)))
 mftc=int(run("%s --config | grep maxFilesToCache | awk {'print $3'}" % (mmdiag)))
 msc=int(run("%s --config | grep maxStatCache | awk {'print $3'}" % (mmdiag)))
 manager_nodes=int(run("%s| grep manager | wc -l" % (mmlscluster)))
-tml=int(run("%s --config | grep tokenMemLimit | awk {'print $2'}" % (mmdiag)))
+tml=int(run("%s --config | grep tokenMemLimit | sed 's/!//' | awk {'print $2'}" % (mmdiag)))
 local_nodes=int(run("%s| grep '^   [0-9]' | wc -l" % (mmlscluster)))
 
 # Set any overrides
@@ -86,13 +86,13 @@ print "%s %s" % ("maxStatCache:".rjust(30,' '),msc)
 print "%s %s" % ("#manager nodes:".rjust(30,' '),manager_nodes)
 print "%s %s" % ("tokenMemLimit:".rjust(30,' '),tml)
 print ""
-print "Checking nodes (local and remote) * (MFTC + MSC) < (#manager nodes -1) * 1.2M * (512M/TML)..."
+print "Checking nodes (local and remote) * (MFTC + MSC) < (#manager nodes -1) * 1.2M * (TML/512M)..."
 print ""
 
 
 # Calculate condition for n to n/2+1 local nodes being active in the cluster.
 for i in range(0,(local_nodes/2)+1):
     left = (num_nodes-i) * (mftc + msc)
-    right = ( manager_nodes -1-i ) * 1200000 * ( 512000000 / float(tml) )
+    right = ( manager_nodes -1-i ) * 1200000 * (  float(tml)/512000000  )
     sys.stdout.write("%s/%s nodes: " % (local_nodes-i,local_nodes))
     check(left,right)
